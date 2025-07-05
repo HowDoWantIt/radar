@@ -19,5 +19,23 @@ It is designed for simulation of radar pulses, moving targets, and signal detect
 
 Using `pip`:
 
+---
+
+
+flowchart TD
+    Start[Start Program] --> LoadConfig[Load Radar Settings]
+    LoadConfig --> CreateTargets[Create Moving Targets]
+    CreateTargets --> SimulatePulse[Simulate Radar Pulse]
+    SimulatePulse --> ReceiveEcho[Receive Echo Signal]
+    ReceiveEcho --> ProcessSignal[Process Signal]
+    ProcessSignal --> DetectTarget{Target Detected?}
+    DetectTarget -->|Yes| DisplayTarget[Display Target]
+    DetectTarget -->|No| ContinueSim[Continue Simulation]
+    DisplayTarget --> ContinueSim
+    ContinueSim --> StopSim{Stop Simulation?}
+    StopSim -->|No| CreateTargets
+    StopSim -->|Yes| End[End Program]
+
+
 ```bash
 pip install -r requirements.txt
