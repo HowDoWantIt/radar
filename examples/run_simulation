@@ -1,0 +1,39 @@
+import time
+from radar_simulator.radar import Radar
+from radar_simulator.targets import Target
+from radar_simulator.signal_processing import apply_noise, detect_targets
+from radar_simulator.visualization import plot_radar
+
+def main():
+    radar = Radar(range_m=1000, pulse_width_s=1e-6, pulse_repetition_interval_s=1e-3, antenna_beamwidth_deg=30)
+
+    targets = [
+        Target(position=[500, 300], velocity=[-5, 2], reflectivity=1.0),
+        Target(position=[-300, 700], velocity=[1, -3], reflectivity=0.8),
+    ]
+
+    dt = 0.1
+    simulation_time = 5.0
+    t = 0.0
+
+    while t < simulation_time:
+        for target in targets:
+            target.update_position(dt)
+
+        pulse = radar.send_pulse(t)
+        echoes = radar.receive_echo(targets, pulse['time'])
+
+        noisy_echoes = []
+        for echo in echoes:
+            strength_noisy = apply_noise(echo['strength'])
+            noisy_echoes.append({**echo, 'strength': strength_noisy})
+
+        detected_targets = detect_targets(noisy_echoes, threshold=0.3)
+
+        plot_radar(targets, detected_targets, radar.range)
+
+        t += dt
+        time.sleep(dt)
+
+if __name__ == "__main__":
+    main()
